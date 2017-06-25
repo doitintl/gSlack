@@ -18,6 +18,7 @@
   "homepage": "https://github.com/doitintl/gcp-alert-service#readme",
   "dependencies": {
     "@google-cloud/datastore": "^1.0.2",
-    "base-64": "^0.1.0"
+    "base-64": "^0.1.0",
+    "slack-node": "^0.1.8"
   }
 }

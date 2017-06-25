@@ -8,6 +8,8 @@ create_export:
 		--log-filter "logName=projects/$$PROJECT/logs/cloudaudit.googleapis.com%2Factivity"
 
 	gcloud --project=$$PROJECT projects add-iam-policy-binding $$PROJECT \
-		--member='serviceAccount:$$(gcloud --project $$PROJECT --format="value(writer_identity)" beta logging sinks describe gcp_alert_service)' \
+		--member=$$(gcloud --project $$PROJECT --format="value(writer_identity)" beta logging sinks describe gcp_alert_service) \
 		--role='roles/pubsub.publisher'
-	
+
+example:
+	make create_export PROJECT=doit-playground TOPIC=test

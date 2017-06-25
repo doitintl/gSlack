@@ -1,16 +1,38 @@
-const Datastore = require('@google-cloud/datastore');
-const Slack = require('slack-node');
-const base64 = require('base-64');
+function runTest(test, data) {
+    $ = data;
+    return eval(`'use strict';(${test});`);
+}
+
+function evalMessage(message, data) {
+    $ = data;
+    return eval(`'use strict';\`${message}\`;`);
+}
 
 exports.pubsubLogSink = function (event, callback) {
+    const base64 = require('base-64');
+
     console.log(`Function input: ${JSON.stringify(event)}`);
     let data = JSON.parse(base64.decode(event.data.data));
     console.log(`Data: ${JSON.stringify(data)}`);
 
-    getConfig()
-        .then(config => {
+    Promise.all([
+        getConfig(),
+        getTests()
+    ])
+        .then(([config, tests]) => {
             console.log(`Config: ${JSON.stringify(config)}`);
-            return sendSlack(config.slackChannel, 'Test Message', config.slackAPIToken);
+            console.log(`Tests: ${JSON.stringify(tests)}`);
+
+            return Promise.all(tests.map(test => {
+                let clonedData = JSON.parse(JSON.stringify(data));
+                if (runTest(test.test, clonedData)) {
+                    let message = evalMessage(test.message, clonedData);
+                    return sendSlack(test.slackChannel, message, config.slackAPIToken);
+                }
+                else {
+                    return Promise.resolve();
+                }
+            }));
         })
         .then(() => {
             callback();
@@ -18,9 +40,10 @@ exports.pubsubLogSink = function (event, callback) {
 };
 
 function getConfig() {
+    const Datastore = require('@google-cloud/datastore');
     const ds = Datastore();
     const query = ds.createQuery(['Config']);
-    return runDSQuery(ds,query).then(configsArray => {
+    return runDSQuery(ds, query).then(configsArray => {
         return configsArray.reduce((configs, config) => {
             configs[config.name] = config.value;
             return configs;
@@ -28,7 +51,15 @@ function getConfig() {
     });
 }
 
-function runDSQuery(ds,query) {
+function getTests() {
+    const Datastore = require('@google-cloud/datastore');
+    const ds = Datastore();
+    const query = ds.createQuery(['Test']);
+    return runDSQuery(ds, query);
+}
+
+function runDSQuery(ds, query) {
+    const Datastore = require('@google-cloud/datastore');
     return new Promise((resolve, reject) => {
         ds.runQuery(query, (err, entities, nextQuery) => {
             if (err) {
@@ -36,7 +67,7 @@ function runDSQuery(ds,query) {
             }
             const hasMore = nextQuery.moreResults !== Datastore.NO_MORE_RESULTS ? nextQuery.endCursor : false;
             if (hasMore) {
-                runDSQuery(ds,nextQuery).then(moreEntities => {
+                runDSQuery(ds, nextQuery).then(moreEntities => {
                     resolve(entities.concat(moreEntities));
                 });
             }
@@ -48,6 +79,8 @@ function runDSQuery(ds,query) {
 }
 
 function sendSlack(channel, message, apiToken) {
+    const Slack = require('slack-node');
+
     return new Promise((resolve, reject) => {
         const slack = new Slack(apiToken);
         slack.api('chat.postMessage', {

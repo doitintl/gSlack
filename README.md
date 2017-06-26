@@ -110,7 +110,7 @@ The information received by the function for the log entry is something like thi
  receiveTimestamp:  "2017-06-26T05:07:54.586745618Z"   
 }
 ```
-#### Bucket created/deleted
+#### Google Cloud Storage Bucket Created/Deleted
 Display bucket name, created/deleted, location, project and by who.
 ```
 {
@@ -122,7 +122,7 @@ Display bucket name, created/deleted, location, project and by who.
 }
 ```
 
-#### VM started/stopped
+#### Google Compute Engine Instance Started/Stopped
 Display instance name, started/stopped, zone, project and by who.
 ```
 {
@@ -134,7 +134,7 @@ Display instance name, started/stopped, zone, project and by who.
 }
 ```
 
-#### GAE deployed new version
+#### Google App Engine New Version Deployed
 Display project, module, version and by who.
 ```
 {

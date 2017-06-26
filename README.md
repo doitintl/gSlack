@@ -1,12 +1,12 @@
-# gcp-alert-service
+# gSlack
 
 ## Prerequisites
-- Have a GCP project with Billing enabled
-- Have access to a user with Owner permissions on the project
-- Have `gcloud` sdk and cli installed on your machine
+- Have a Google Cloud Platform project with enabled billing
+- Have access to a user with `Owner` role on the project
+- Have `gcloud` SDK and CLI installed on your machine ([quickstart](https://cloud.google.com/sdk/docs/quickstarts))
 
 ## Deployment
-- Make sure your `gcloud` sdk and cli environment is authenticated against the requested GCP project with a user that has Owner permissions.
+- Make sure your `gcloud` SDK and CLI environment is authenticated against the requested GCP project with a user that has Owner permissions.
 - Run `$ make create-export PROJECT=<YOUR_PROJECT_ID>` (Replace `<YOUR_PROJECT_ID>` with your project ID)
 - Run `$ make deploy-function PROJECT=<YOUR_PROJECT_ID>` (Replace `<YOUR_PROJECT_ID>` with your project ID)
 - Configure the deployment using the [Datastore UI](https://console.cloud.google.com/datastore)

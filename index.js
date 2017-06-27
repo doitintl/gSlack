@@ -10,19 +10,13 @@ function evalMessage(message, data) {
 
 exports.pubsubLogSink = function (event, callback) {
     const base64 = require('base-64');
-
-    console.log(`Function input: ${JSON.stringify(event)}`);
     let data = JSON.parse(base64.decode(event.data.data));
-    console.log(`Data: ${JSON.stringify(data)}`);
 
     Promise.all([
         getConfig(),
         getTests()
     ])
         .then(([config, tests]) => {
-            console.log(`Config: ${JSON.stringify(config)}`);
-            console.log(`Tests: ${JSON.stringify(tests)}`);
-
             return Promise.all(tests.map(test => {
                 let clonedData = JSON.parse(JSON.stringify(data));
                 if (runTest(test.test, clonedData)) {

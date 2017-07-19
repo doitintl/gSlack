@@ -1,11 +1,23 @@
 function runTest(test, data) {
-    $ = data;
-    return eval(`'use strict';(${test});`);
+    try {
+        $ = data;
+        return eval(`'use strict';(${test});`);
+    }
+    catch (err) {
+        console.log(`Rule test error in '${test}': ${err}`);
+        return false;
+    }
 }
 
 function evalMessage(message, data) {
-    $ = data;
-    return eval(`'use strict';\`${message}\`;`);
+    try {
+        $ = data;
+        return eval(`'use strict';\`${message}\`;`);
+    }
+    catch (err) {
+        console.log(`Rule message error in '${message}': ${err}`);
+        return "";
+    }
 }
 
 exports.pubsubLogSink = function (event, callback) {
@@ -29,7 +41,10 @@ exports.pubsubLogSink = function (event, callback) {
             }));
         })
         .then(() => {
-            callback();
+            callback(null, {});
+        })
+        .catch(err => {
+            callback(err);
         });
 };
 
@@ -79,7 +94,8 @@ function sendSlack(channel, message, apiToken) {
         const slack = new Slack(apiToken);
         slack.api('chat.postMessage', {
             text: message,
-            channel: channel
+            channel: channel,
+            as_user: true
         }, function (err, response) {
             if (!!err) {
                 reject(err);

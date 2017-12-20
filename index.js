@@ -33,7 +33,8 @@ exports.pubsubLogSink = function (event, callback) {
                 let clonedData = JSON.parse(JSON.stringify(data));
                 if (runTest(test.test, clonedData)) {
                     let message = evalMessage(test.message, clonedData);
-                    return sendSlack(test.slackChannel, message, config.slackAPIToken);
+                    let attachment = test.attachment ? evalMessage(test.attachment, clonedData) : null;
+                    return sendSlack(test.slackChannel, message, attachment, config.slackAPIToken);
                 }
                 else {
                     return Promise.resolve();
@@ -87,16 +88,26 @@ function runDSQuery(ds, query) {
     });
 }
 
-function sendSlack(channel, message, apiToken) {
+function sendSlack(channel, message, attachment, apiToken) {
     const Slack = require('slack-node');
+
+    const payload = {
+        text: message,
+        channel: channel,
+        as_user: true
+    };
+
+    if (attachment) {
+        // slack-node uses form-data instead of plain JSON payload
+        payload['attachments'] = JSON.stringify([{
+            'text': attachment,
+            'mrkdwn_in': ['text', 'pretext']
+        }]);
+    }
 
     return new Promise((resolve, reject) => {
         const slack = new Slack(apiToken);
-        slack.api('chat.postMessage', {
-            text: message,
-            channel: channel,
-            as_user: true
-        }, function (err, response) {
+        slack.api('chat.postMessage', payload, function (err, response) {
             if (!!err) {
                 reject(err);
             }

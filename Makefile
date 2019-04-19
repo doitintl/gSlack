@@ -13,9 +13,9 @@ create-export:
 
 	gsutil mb -p $$PROJECT gs://$$PROJECT-gcp-alert-service
 
-	gcloud --project=$$PROJECT beta service-management enable cloudfunctions.googleapis.com
+	gcloud --project=$$PROJECT beta services enable cloudfunctions.googleapis.com
 
 deploy-function:
 	gcloud --project=$$PROJECT beta functions deploy gcp-alert-service \
 		--stage-bucket $$PROJECT-gcp-alert-service --trigger-topic gcp-alert-service \
-		--entry-point=pubsubLogSink --region=us-central1
+		--entry-point=pubsubLogSink --runtime nodejs8 --region=us-central1

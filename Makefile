@@ -18,4 +18,4 @@ create-export:
 deploy-function:
 	gcloud --project=$$PROJECT beta functions deploy gcp-alert-service \
 		--stage-bucket $$PROJECT-gcp-alert-service --trigger-topic gcp-alert-service \
-		--entry-point=pubsubLogSink --runtime nodejs8 --region=us-central1
+		--entry-point=pubsubLogSink --runtime nodejs6 --region=us-central1

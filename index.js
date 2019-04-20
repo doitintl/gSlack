@@ -20,9 +20,9 @@ function evalMessage(message, data) {
     }
 }
 
-exports.pubsubLogSink = function (event, callback) {
+exports.pubsubLogSink = function (data, context, callback) {
     const base64 = require('base-64');
-    let data = JSON.parse(base64.decode(event.data.data));
+    data = JSON.parse(base64.decode(data.data));
 
     Promise.all([
         getConfig(),

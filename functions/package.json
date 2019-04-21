@@ -1,0 +1,20 @@
+{
+  "name": "gslack",
+  "description": "",
+  "engines": {
+    "node": "8"
+  },
+  "scripts": {
+    "serve": "firebase serve --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions:gSlack",
+    "logs": "firebase functions:log"
+  },
+  "dependencies": {
+    "@slack/web-api": "^5.0.1",
+    "firebase-admin": "~7.0.0",
+    "firebase-functions": "^2.2.0"
+  },
+  "private": true
+}

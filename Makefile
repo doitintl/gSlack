@@ -1,21 +1,13 @@
-all:
-
 create-export:
-	gcloud --project=$$PROJECT beta pubsub topics create gcp-alert-service
+	# Create PubSub topic
+	gcloud --project=$$PROJECT pubsub topics create gslack
 	
-	gcloud --project=$$PROJECT beta logging sinks create gcp_alert_service \
-		pubsub.googleapis.com/projects/$$PROJECT/topics/gcp-alert-service \
+	# Create logging export with PubSub sink
+	gcloud --project=$$PROJECT logging sinks create gslack \
+		pubsub.googleapis.com/projects/$$PROJECT/topics/gslack \
 		--log-filter "logName=projects/$$PROJECT/logs/cloudaudit.googleapis.com%2Factivity"
 
+	# Set permissions on the new topic
 	gcloud --project=$$PROJECT projects add-iam-policy-binding $$PROJECT \
-		--member=$$(gcloud --project $$PROJECT --format="value(writer_identity)" beta logging sinks describe gcp_alert_service) \
+		--member=$$(gcloud --project $$PROJECT --format="value(writer_identity)" logging sinks describe gslack) \
 		--role='roles/pubsub.publisher'
-
-	gsutil mb -p $$PROJECT gs://$$PROJECT-gcp-alert-service
-
-	gcloud --project=$$PROJECT beta services enable cloudfunctions.googleapis.com
-
-deploy-function:
-	gcloud --project=$$PROJECT beta functions deploy gcp-alert-service \
-		--stage-bucket $$PROJECT-gcp-alert-service --trigger-topic gcp-alert-service \
-		--entry-point=pubsubLogSink --runtime nodejs6 --region=us-central1

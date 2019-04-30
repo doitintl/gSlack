@@ -38,7 +38,7 @@ function evalTest(data, test) {
     $ = data;
     return eval(`'use strict';(${test});`);
   } catch (err) {
-    console.error(`Rule test error in '${test}': ${err}`);
+    console.error(err, test);
     return false;
   }
 }
@@ -48,8 +48,8 @@ function evalMessage(data, message) {
     $ = data;
     return eval(`'use strict';\`${message}\`;`);
   } catch (err) {
-    console.error(`Rule message error in '${message}': ${err}`);
-    return "";
+    console.error(err, message);
+    return `Error: ${err} in rule message:\n ${message}`;
   }
 }
 
@@ -66,12 +66,12 @@ function sendSlack(data, rule) {
 exports.gSlack = functions
   .runWith(runtimeOpts)
   .pubsub.topic("gslack")
-  .onPublish(async (message, context) => {
-    const messageJSON = message.json;
+  .onPublish((message, context) => {
+    const data = message.json;
     return Promise.all(
       rules.map(rule => {
-        if (evalTest(messageJSON, rule.test)) {
-          return sendSlack(messageJSON, rule);
+        if (evalTest(data, rule.test)) {
+          return sendSlack(data, rule);
         }
         return Promise.resolve();
       })

@@ -39,7 +39,7 @@
 | test | string | Must be a a valid JS expression that returns a boolean. If it returns true the test passes. e.g. `$.protoPayload.serviceName==='cloudfunctions.googleapis.com'` |
 | message | string | Must be a a valid JS string template. It will be evaluated to produce the message. e.g. `This is the logname: ${$.logName}` |
 
-- Each document is a rule that will be evaluted by the function and will be posted to the corresponding slack channel if the test express passes.
+- Each document is a rule that will be evaluted by the function and will be posted to the corresponding slack channel if the evaluated test expression passes as `true`.
 - If you want to temporary disable a rule, simply update the `disabled` field to `true`.
 
 ## Function Message Payload Example

@@ -142,9 +142,55 @@ The information received by the function for the log entry is something like thi
         channel: "general",
         disabled: false,
         test: "$.protoPayload.serviceName==='storage.googleapis.com' && ( $.protoPayload.methodName==='storage.buckets.create' || $.protoPayload.methodName==='storage.buckets.delete')",
-        message: "Bucket '${$.resource.labels.bucket_name}' was ${$.protoPayload.methodName==='storage.buckets.create'?'created':'deleted'} at location '${$.resource.labels.location}' by '${$.protoPayload.authenticationInfo.principalEmail}' in project '${$.resource.labels.project_id}'"
+        message: "Bucket '${$.resource.labels.bucket_name}' was ${$.protoPayload.methodName==='storage.buckets.create'?'created':'deleted'} at location '${$.resource.labels.location}' by '${$.protoPayload.authenticationInfo.principalEmail}' in project '${$.resource.labels.project_id}'",
+        attachments: null
 
     ```
+
+* [Slack Message Formatting](https://api.slack.com/docs/message-formatting)
+
+    Use the attachments field (type of array of maps) to add Slack message attachments instead of the default text message.
+
+    One of 'message' or 'attachments' fields must not be null.
+
+    ```
+        channel: "general",
+        disabled: false,
+        test: "$.protoPayload.serviceName==='storage.googleapis.com' && ( $.protoPayload.methodName==='storage.buckets.create' || $.protoPayload.methodName==='storage.buckets.delete')",
+        message: null,
+        attachments: [
+            {
+                title: "Cloud Storage Notification",
+                color: "${$.protoPayload.methodName==='storage.buckets.create'?'#36a64f':'#de1738'}",
+                fields: [
+                    {
+                        short: true,
+                        title: "Operation",
+                        value: "${$.protoPayload.methodName==='storage.buckets.create'?'Create':'Delete'}"
+                    },
+                    {
+                        short: true,
+                        title: "Resource Name",
+                        value: "${$.resource.labels.bucket_name}"
+                    },
+                    {
+                        short: true,
+                        title: "Project ID",
+                        value: "${$.resource.labels.project_id}"
+                    },
+                    {
+                        short: true,
+                        title: "User",
+                        value: "${$.protoPayload.authenticationInfo.principalEmail}"
+                    },
+                ]
+            }
+        ]
+    ```
+
+    ![alt text](./tutorial/FormattingDocument.png)
+    ![alt text](./tutorial/FormattingResult.png)
+
 
 ### Google Compute Engine Instance Started/Stopped
 
@@ -158,7 +204,8 @@ The information received by the function for the log entry is something like thi
         channel: "devops",
         disabled: false,
         test: "$.protoPayload.serviceName==='compute.googleapis.com' && ( $.protoPayload.methodName==='v1.compute.instances.start' || $.protoPayload.methodName==='v1.compute.instances.stop') && $.operation.last",
-        message: "Instance '${$.protoPayload.resourceName.split('/').slice(-1)[0]}' was ${$.protoPayload.methodName==='v1.compute.instances.start'?'started':'stopped'} at zone '${$.resource.labels.zone}' by '${$.protoPayload.authenticationInfo.principalEmail}' in project '${$.resource.labels.project_id}'"
+        message: "Instance '${$.protoPayload.resourceName.split('/').slice(-1)[0]}' was ${$.protoPayload.methodName==='v1.compute.instances.start'?'started':'stopped'} at zone '${$.resource.labels.zone}' by '${$.protoPayload.authenticationInfo.principalEmail}' in project '${$.resource.labels.project_id}'",
+        attachments: null
     ```
 
 ### Google App Engine New Version Deployed
@@ -173,6 +220,7 @@ The information received by the function for the log entry is something like thi
         channel: "@user",
         disabled: false,
         test: "$.protoPayload.serviceName==='appengine.googleapis.com' && $.protoPayload.methodName==='google.appengine.v1.Versions.CreateVersion' && $.operation.last",
-        message: "Google AppEngine version created with version ID '${$.resource.labels.version_id}' for module '${$.resource.labels.module_id}' by '${$.protoPayload.authenticationInfo.principalEmail}' in project '${$.resource.labels.project_id}'"
+        message: "Google AppEngine version created with version ID '${$.resource.labels.version_id}' for module '${$.resource.labels.module_id}' by '${$.protoPayload.authenticationInfo.principalEmail}' in project '${$.resource.labels.project_id}'",
+        attachments: null
     ```
 

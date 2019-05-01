@@ -43,23 +43,43 @@ function evalTest(data, test) {
   }
 }
 
-function evalMessage(data, message) {
-  try {
-    $ = data;
-    return eval(`'use strict';\`${message}\`;`);
-  } catch (err) {
-    console.error(err, message);
-    return `Error: ${err} in rule message:\n ${message}`;
+function evalMessageText(data, message) {
+  if (message) {
+    try {
+      $ = data;
+      return eval(`'use strict';\`${message}\`;`);
+    } catch (err) {
+      console.error(err, message);
+      return `Error: ${err} in rule message:\n ${message}`;
+    }
+  }
+}
+
+function evalMessageAttachments(data, attachments) {
+  if (attachments) {
+    try {
+      $ = data;
+      return JSON.parse(
+        eval(`'use strict';\`${JSON.stringify(attachments)}\`;`)
+      );
+    } catch (err) {
+      console.error(err, attachments);
+      return [
+        {
+          title: "GSLACK ERROR",
+          text: `Error: ${err} in rule attachments`
+        }
+      ];
+    }
   }
 }
 
 function sendSlack(data, rule) {
-  const { channel, message } = rule;
-  const text = evalMessage(data, message);
   return web.chat.postMessage({
     as_user: true,
-    channel,
-    text
+    channel: rule.channel,
+    text: evalMessageText(data, rule.message),
+    attachments: evalMessageAttachments(data, rule.attachments)
   });
 }
 

@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Have a Google Cloud Platform project with enabled billing
+- Have a Google Cloud Platform project with billing & Cloud Build API enabled
 - Have access to a user with `Owner` role on the project
 - Have `gcloud` SDK and CLI installed on your machine ([quickstart](https://cloud.google.com/sdk/docs/quickstarts))
 - Have [`firebase-tools`](https://firebase.google.com/docs/cli/) CLI installed on your machine
